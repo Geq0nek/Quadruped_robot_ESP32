@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "Quadruped",
-    "project_version":    "486a02f",
+    "project_version":    "14fc10d-dirty",
     "project_path":       "D:/Projects/Quadruped_robot_ESP32",
     "idf_path":           "C:/Users/Tomek/.platformio/packages/framework-espidf",
     "build_dir":          "D:/Projects/Quadruped_robot_ESP32/.pio/build/adafruit_feather_esp32s3_tft",
@@ -1045,7 +1045,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "D:/Projects/Quadruped_robot_ESP32/.pio/build/adafruit_feather_esp32s3_tft/esp-idf/src/libsrc.a",
-            "sources": [ "D:/Projects/Quadruped_robot_ESP32/src/CMakeLists.txt", "D:/Projects/Quadruped_robot_ESP32/src/main.c", "D:/Projects/Quadruped_robot_ESP32/src/webServer.c" ],
+            "sources": [ "D:/Projects/Quadruped_robot_ESP32/src/CMakeLists.txt", "D:/Projects/Quadruped_robot_ESP32/src/main.c", "D:/Projects/Quadruped_robot_ESP32/src/webBody.c", "D:/Projects/Quadruped_robot_ESP32/src/webServer.c" ],
             "include_dirs": []
         },
         "tcp_transport": {

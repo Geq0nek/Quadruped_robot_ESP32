@@ -3,6 +3,11 @@
 #include "esp_log.h"
 #include "esp_http_server.h"
 
+#include "webBody.c"
+
+// DEFINE MIN
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+
 #define WIIF_SSID "PLAY_Swiatlowodowy_99DF"
 #define WIFI_PASSWORD "9Zg@7WNB1tcM"
 #define WIFI_MAXIMUM_RETRY_NUMBER 3
@@ -11,6 +16,7 @@
 #define WIFI_FAIL_BIT BIT1
 
 static const char *WIFI_TAG = "Wifi Section"; 
+static const char *HTTP_TAG = "HTTP Server";
 
 static EventGroupHandle_t s_wifi_event_group;
 
@@ -39,7 +45,7 @@ static void event_hanlder(void * arg, esp_event_base_t event_base, int32_t event
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-        ESP_LOGI(WIFI_TAG, "IP ", IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(WIFI_TAG, "IP: " IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
@@ -110,22 +116,88 @@ void connect_wifi(void)
     vEventGroupDelete(s_wifi_event_group);
 }
 
-esp_err_t send_beb_page(httpd_req_t *req) 
+esp_err_t get_req_handler(httpd_req_t *req)
 {
-    int response;
-    //TODO - CREATE ROBOT MOVEMENT
-    
+    httpd_resp_send(req, HTML_RESPONSE, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
 }
 
-eso_err_t get_req_handler(httpd_req_t *req)
+esp_err_t post_req_handler(httpd_req_t *req)
 {
-    return send_web_page(req);    
+    char buf[100];
+    int ret, remaining = req->content_len;
+
+    // READ DATA FROM REQUSET
+    if ((ret = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf) - 1))) <= 0) 
+    {
+        if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
+            httpd_resp_send_408(req);
+        }
+        return ESP_FAIL;
+    }
+    buf[ret] = '\0'; // END OF THE STRING
+
+    // PARSING REQUEST
+    char *action = strstr(buf, "action="); 
+    if (action) 
+    {
+        action += strlen("action=");
+        
+        if (strcmp(action, "forward_start") == 0) {
+            // MOVE FORWARD
+            //startMovingForward();
+        } else if (strcmp(action, "backward_start") == 0) {
+            // MOVE BACKWARD
+            //startMovingBackward();
+        } else if (strcmp(action, "left_start") == 0) {
+            // MOVE LEFT
+            //startTurningLeft();
+        } else if (strcmp(action, "right_start") == 0) {
+            // MOVE RIGHT
+            //startTurningRight();
+        } else if (strcmp(action, "stop") == 0) {
+            // STOP ROBOT
+            //stopMoving();
+        }
+    }
+
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
 }
 
-httpd_uri_t uri_post = 
+void start_webserver(void)
 {
-    .uri = "/",
-    .method = HTTP_POST,
-    .handler = get_req_handler,
-    .user_ctx = NULL    
-};
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    httpd_handle_t server = NULL;
+
+    if (httpd_start(&server, &config) == ESP_OK)
+    {
+        httpd_uri_t get_uri = 
+        {
+            .uri = "/",
+            .method = HTTP_GET,
+            .handler = get_req_handler,
+            .user_ctx = NULL
+        };
+
+        httpd_uri_t post_uri = 
+        {
+            .uri = "/control",
+            .method = HTTP_POST,
+            .handler = post_req_handler,
+            .user_ctx = NULL
+        };
+
+        httpd_register_uri_handler(server, &get_uri);
+        httpd_register_uri_handler(server, &post_uri);
+    }
+}
+
+void app_main(void)
+{
+    ESP_LOGI(HTTP_TAG, "Initializing Wifi...");
+    connect_wifi();
+
+    ESP_LOGI(HTTP_TAG, "Starting web server...");
+    start_webserver();
+}
