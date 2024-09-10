@@ -2,6 +2,7 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_http_server.h"
+#include "nvs_flash.h"
 
 #include "webBody.c"
 
@@ -45,6 +46,7 @@ static void event_hanlder(void * arg, esp_event_base_t event_base, int32_t event
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+        ESP_LOGI(WIFI_TAG, "Received IP address event.");
         ESP_LOGI(WIFI_TAG, "IP: " IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
@@ -195,9 +197,19 @@ void start_webserver(void)
 
 void app_main(void)
 {
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) 
+    {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
     ESP_LOGI(HTTP_TAG, "Initializing Wifi...");
     connect_wifi();
 
     ESP_LOGI(HTTP_TAG, "Starting web server...");
     start_webserver();
 }
+
+
+
