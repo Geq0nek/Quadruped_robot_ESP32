@@ -1,29 +1,6 @@
-#include "esp_wifi.h"
-#include "esp_err.h"
-#include "esp_log.h"
-#include "esp_http_server.h"
-#include "nvs_flash.h"
+#include "webServer.h"
 
-#include "webBody.c"
-
-// DEFINE MIN
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-
-#define WIIF_SSID "PLAY_Swiatlowodowy_99DF"
-#define WIFI_PASSWORD "9Zg@7WNB1tcM"
-#define WIFI_MAXIMUM_RETRY_NUMBER 3
-
-#define WIFI_CONNECTED_BIT BIT0
-#define WIFI_FAIL_BIT BIT1
-
-static const char *WIFI_TAG = "Wifi Section"; 
-static const char *HTTP_TAG = "HTTP Server";
-
-static EventGroupHandle_t s_wifi_event_group;
-
-static int s_retry_num = 0;
-
-static void event_hanlder(void * arg, esp_event_base_t event_base, int32_t event_id, void *event_data) 
+void event_handler(void * arg, esp_event_base_t event_base, int32_t event_id, void *event_data) 
 {
     if(event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
     {
@@ -69,13 +46,13 @@ void connect_wifi(void)
     esp_event_handler_instance_t instance_any_ip;
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT, 
                                                         ESP_EVENT_ANY_ID,
-                                                        &event_hanlder,
+                                                        &event_handler,
                                                         NULL,
                                                         &instance_any_id));
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT, 
                                                         IP_EVENT_STA_GOT_IP,
-                                                        &event_hanlder,
+                                                        &event_handler,
                                                         NULL,
                                                         &instance_any_ip));
 
@@ -147,19 +124,19 @@ esp_err_t post_req_handler(httpd_req_t *req)
         
         if (strcmp(action, "forward_start") == 0) {
             // MOVE FORWARD
-            //startMovingForward();
+            move_forward();
         } else if (strcmp(action, "backward_start") == 0) {
             // MOVE BACKWARD
-            //startMovingBackward();
+            move_backward();
         } else if (strcmp(action, "left_start") == 0) {
             // MOVE LEFT
-            //startTurningLeft();
+            move_left();
         } else if (strcmp(action, "right_start") == 0) {
             // MOVE RIGHT
-            //startTurningRight();
+            move_right();
         } else if (strcmp(action, "stop") == 0) {
             // STOP ROBOT
-            //stopMoving();
+            stop_moving();
         }
     }
 
@@ -195,21 +172,21 @@ void start_webserver(void)
     }
 }
 
-void app_main(void)
-{
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) 
-    {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-    ESP_LOGI(HTTP_TAG, "Initializing Wifi...");
-    connect_wifi();
+// void app_main(void)
+// {
+//     esp_err_t ret = nvs_flash_init();
+//     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) 
+//     {
+//         ESP_ERROR_CHECK(nvs_flash_erase());
+//         ret = nvs_flash_init();
+//     }
+//     ESP_ERROR_CHECK(ret);
+//     ESP_LOGI(HTTP_TAG, "Initializing Wifi...");
+//     connect_wifi();
 
-    ESP_LOGI(HTTP_TAG, "Starting web server...");
-    start_webserver();
-}
+//     ESP_LOGI(HTTP_TAG, "Starting web server...");
+//     start_webserver();
+// }
 
 
 
