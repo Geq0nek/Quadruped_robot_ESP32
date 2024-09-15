@@ -3,3 +3,27 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+# Ignoruj folder build PlatformIO
+.pio/build/
+
+# Ignoruj konfiguracje VSCode
+.vscode/
+
+# Ignoruj pliki logów
+*.log
+
+# Ignoruj pliki tymczasowe systemu
+*.DS_Store
+*.tmp
+*.swp
+
+# Ignoruj pliki binarne (kompilaty)
+*.bin
+*.elf
+*.hex
+
+# Ignoruj inne tymczasowe pliki utworzone podczas budowania
+*.pyc
+*.o
+*.d
+*.suo
