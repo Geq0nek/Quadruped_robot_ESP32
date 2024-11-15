@@ -10,12 +10,18 @@ void app_main()
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
+
     ESP_ERROR_CHECK(ret);
     ESP_LOGI(HTTP_TAG, "Initializing Wifi...");
     connect_wifi();
+
+    vTaskDelay(100/portTICK_PERIOD_MS);
 
     ESP_LOGI(HTTP_TAG, "Starting web server...");
     start_webserver();
 
     start_pca();
+
+    vTaskDelay(100/portTICK_PERIOD_MS);
+
 }

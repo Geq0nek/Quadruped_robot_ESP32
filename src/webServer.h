@@ -36,6 +36,5 @@ esp_err_t post_req_handler(httpd_req_t *req);
 
 void start_webserver(void);
 
-// void app_main(void);
 
 
