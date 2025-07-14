@@ -11,13 +11,6 @@
 // uint16_t pwm_value = (57 * (4096 / 180)); - 90* SRODEK - 1297,0(6) ~ 1297
 // uint16_t pwm_value = (94 * (4096 / 180)); - 180* GÓRA  - 2139,0(2) ~ 2139
 
-int legs[4][3] = {
-    {0, 1, 2}, // Leg 1
-    {3, 4, 5}, // Leg 2
-    {6, 7, 8}, // Leg 3
-    {9, 10, 11} // Leg 4
-};
-
 long map(long x)
 {
     return (x - 0) * (2139 - 455) / (180 - 0) + 455;
@@ -77,17 +70,12 @@ void sit(void)
     pca9685_set_pwm(9, 2139, map(90));
     pca9685_set_pwm(6, 455, map(90));
 
-    vTaskDelay(40);
 
     pca9685_set_pwm(10, 2139, map(90));
     pca9685_set_pwm(7, 455, map(90));
 
-    vTaskDelay(40);
-
     pca9685_set_pwm(0, 455, map(90));
-    pca9685_set_pwm(3, 2139, map(90));
-
-    vTaskDelay(40);
+    pca9685_set_pwm(3, 2139, map(90));;
 
     pca9685_set_pwm(1, 455, map(90));
     pca9685_set_pwm(4, 2139, map(90));
