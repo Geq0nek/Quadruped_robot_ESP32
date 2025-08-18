@@ -23,4 +23,4 @@ void stand(void);
 
 void sit(void);
 
-long map(long x);
+static inline uint16_t angle_to_pwm(uint16_t angle);
